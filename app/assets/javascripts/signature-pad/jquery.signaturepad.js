@@ -168,6 +168,16 @@ function SignaturePad (selector, options) {
     mouseLeaveTimeout = false
     mouseButtonDown = false
   }
+  
+  function getTotalOffset(element) { 
+    if (element) { 
+      var parentOffset = getTotalOffset(element.offsetParent); 
+      return { left: (element.offsetLeft + parentOffset.left), top: (element.offsetTop + parentOffset.top) }; 
+    } 
+    else { 
+      return { left: 0, top: 0 }; 
+    } 
+  }
 
   /**
    * Draws a line on canvas using the mouse position
@@ -184,7 +194,12 @@ function SignaturePad (selector, options) {
 
     e.preventDefault()
 
-    offset = $(e.target).offset()
+    if (/Android/i.test(navigator.userAgent) && !(/Firefox|SamsungBrowser/i.test(navigator.userAgent))) { 
+      offset = getTotalOffset(canvasContext.canvas) 
+    } 
+    else { 
+      offset = $(e.target).offset(); 
+    } 
 
     clearTimeout(mouseLeaveTimeout)
     mouseLeaveTimeout = false
@@ -239,7 +254,7 @@ function SignaturePad (selector, options) {
   function stopDrawingWrapper () {
     stopDrawing()
   }
-
+  
   /**
    * Callback registered to mouse/touch events of the canvas
    * Stops the drawing abilities
